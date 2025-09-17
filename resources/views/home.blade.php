@@ -46,7 +46,26 @@
                             </ul>
                         </div>
                     @endif
-
+                    {{-- RUNNING --}}
+                    @if($exercise->type === 'running')
+                        <div class="mb-2 small">
+                            <strong>Series:</strong> {{ $exercise->series }} <br>
+                            @if($exercise->distance)
+                                <strong>Distancia:</strong> {{ $exercise->distance }} m <br>
+                            @endif
+                            @if($exercise->pace)
+                                <strong>Ritmo objetivo:</strong> {{ $exercise->pace }} <br>
+                            @endif
+                            @if($exercise->bpm_min && $exercise->bpm_max)
+                                <strong>Pulsaciones:</strong> {{ $exercise->bpm_min }}–{{ $exercise->bpm_max }} ppm <br>
+                            @endif
+                            @if($exercise->rest_min && $exercise->rest_max)
+                                <strong>Descanso:</strong> {{ $exercise->rest_min/60 }}–{{ $exercise->rest_max/60 }} min <br>
+                            @elseif($exercise->rest_min)
+                                <strong>Descanso:</strong> {{ $exercise->rest_min/60 }} min <br>
+                            @endif
+                        </div>
+                    @endif
                     <div class="mt-auto">
                         @if(!$exercise->completed)
                             <form method="POST" action="/exercise/{{ $exercise->id }}/complete" class="mb-2">
@@ -72,6 +91,20 @@
                                 <div class="mb-2">
                                     <input type="text" name="time_done" placeholder="Tiempo (mm:ss) o rondas" value="{{ $exercise->time_done }}" class="form-control form-control-sm">
                                 </div>
+                                @if($exercise->type === 'running')
+                                    <div class="mb-2 d-flex gap-2">
+                                        <input type="number" name="distance" placeholder="Distancia (m)" value="{{ $exercise->distance }}" class="form-control form-control-sm">
+                                        <input type="text" name="pace" placeholder="Ritmo (%) o min/km" value="{{ $exercise->pace }}" class="form-control form-control-sm">
+                                    </div>
+                                    <div class="mb-2 d-flex gap-2">
+                                        <input type="number" name="bpm_min" placeholder="BPM min" value="{{ $exercise->bpm_min }}" class="form-control form-control-sm">
+                                        <input type="number" name="bpm_max" placeholder="BPM max" value="{{ $exercise->bpm_max }}" class="form-control form-control-sm">
+                                    </div>
+                                    <div class="mb-2 d-flex gap-2">
+                                        <input type="number" name="rest_min" placeholder="Descanso min (s)" value="{{ $exercise->rest_min }}" class="form-control form-control-sm">
+                                        <input type="number" name="rest_max" placeholder="Descanso max (s)" value="{{ $exercise->rest_max }}" class="form-control form-control-sm">
+                                    </div>
+                                @endif
                                 <button class="btn btn-primary btn-sm w-100">Guardar</button>
                             </form>
                         </div>

@@ -9,13 +9,28 @@
             <div class="card h-100 shadow-sm">
                 <div class="card-body d-flex flex-column">
                     <h5 class="card-title">{{ $ex->name }}</h5>
+                    @if($ex->type === 'running')
+                    <p class="card-text small">
+                        <strong>Series:</strong> {{ $ex->series }}<br>
+                        @if($ex->distance)<strong>Distancia:</strong> {{ $ex->distance }} m<br>@endif
+                        @if($ex->pace)<strong>Ritmo:</strong> {{ $ex->pace }}<br>@endif
+                        @if($ex->bpm_min && $ex->bpm_max)
+                            <strong>BPM:</strong> {{ $ex->bpm_min }} – {{ $ex->bpm_max }}<br>
+                        @endif
+                        @if($ex->rest_min && $ex->rest_max)
+                            <strong>Descanso:</strong> {{ $ex->rest_min }}–{{ $ex->rest_max }} seg<br>
+                        @endif
+                    </p>
+                @endif
 
                     @if ($ex->notes)
                         <p class="card-text mb-2"><strong>Notas: </strong>{{ $ex->notes }}</p>
                     @endif
 
                     <p class="card-text mb-2">
+                        @if($ex->type != 'running')
                         <strong>Series x Reps:</strong> {{ $ex->series }} x {{ $ex->reps }}<br>
+                        @endif
                         @if($ex->weight)<strong>Peso:</strong> {{ $ex->weight }} kg<br>@endif
                         <strong>Tipo:</strong> {{ ucfirst($ex->type) }}
                     </p>
@@ -52,15 +67,6 @@
                     @endif
 
                     <div class="mt-auto">
-                        @if(!$ex->completed)
-                            <form method="POST" action="/exercise/{{ $ex->id }}/complete" class="mb-2">
-                                @csrf
-                                <button class="btn btn-success btn-sm w-100">Completar</button>
-                            </form>
-                        @else
-                            <span class="badge bg-success mb-2">✔ Completado</span>
-                        @endif
-
                         <button class="btn btn-outline-secondary btn-sm w-100 mb-2" onclick="toggle('edit-{{ $ex->id }}')">Editar</button>
 
                         <form method="POST" action="/exercise/{{ $ex->id }}/delete" class="mb-2">
@@ -104,13 +110,28 @@
         <input type="number" name="weight" placeholder="Peso (kg, opcional)" class="form-control">
     </div>
     <div class="mb-2">
-        <select name="type" class="form-select">
+        <select name="type" class="form-select" onchange="toggleFields(this.value)">
             <option value="normal">Normal</option>
             <option value="emom">EMOM</option>
             <option value="amrap">AMRAP</option>
-            <option value="for_time">For Time</option>
+            <option value="running">Running</option>
             <option value="hiit">HIIT</option>
         </select>
+    </div>
+    {{-- Campos para running --}}
+    <div id="running-fields" style="display:none;">
+        <div class="mb-2 d-flex gap-2">
+            <input type="number" name="distance" placeholder="Distancia (m)" class="form-control">
+            <input type="text" name="pace" placeholder="Ritmo (ej: 75% o 5:00/km)" class="form-control">
+        </div>
+        <div class="mb-2 d-flex gap-2">
+            <input type="number" name="bpm_min" placeholder="BPM min" class="form-control">
+            <input type="number" name="bpm_max" placeholder="BPM max" class="form-control">
+        </div>
+        <div class="mb-2 d-flex gap-2">
+            <input type="number" name="rest_min" placeholder="Descanso min (s)" class="form-control">
+            <input type="number" name="rest_max" placeholder="Descanso max (s)" class="form-control">
+        </div>
     </div>
     <button class="btn btn-primary">Añadir ejercicio</button>
 </form>
@@ -121,6 +142,10 @@
 function toggle(id){
     const el = document.getElementById(id);
     el.style.display = (el.style.display === 'none') ? 'block' : 'none';
+}
+function toggleFields(type) {
+    document.getElementById('running-fields').style.display =
+        (type === 'running') ? 'block' : 'none';
 }
 </script>
 @endsection

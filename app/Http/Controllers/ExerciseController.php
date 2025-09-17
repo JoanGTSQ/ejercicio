@@ -26,28 +26,40 @@ class ExerciseController extends Controller
     }
 
     // Añadir un ejercicio normal
-    public function store(Request $request, $pack_id, $day_id)
-    {
-        $validated = $request->validate([
-            'name'   => 'required|string|max:255',
-            'series' => 'nullable|integer|min:1',
-            'reps'   => 'nullable|integer|min:1',
-            'weight' => 'nullable|numeric',
-            'type'   => 'required|string|in:normal,emom,amrap,for_time,hiit',
-        ]);
+   public function store(Request $request, $pack_id, $day_id)
+{
+    $validated = $request->validate([
+        'name'   => 'required|string|max:255',
+        'series' => 'nullable|integer|min:1',
+        'reps'   => 'nullable|integer|min:1',
+        'weight' => 'nullable|numeric',
+        'type'   => 'required|string|in:normal,emom,amrap,for_time,hiit,running',
+        'distance'  => 'nullable|integer|min:1',
+        'pace'      => 'nullable|string|max:50',
+        'bpm_min'   => 'nullable|integer|min:0',
+        'bpm_max'   => 'nullable|integer|min:0',
+        'rest_min'  => 'nullable|integer|min:0',
+        'rest_max'  => 'nullable|integer|min:0',
+    ]);
 
-        Exercise::create([
-            'day_id'     => $day_id,
-            'name'       => $validated['name'],
-            'series'     => $validated['series'] ?? 1,
-            'reps'       => $validated['reps'] ?? 1,
-            'weight'     => $validated['weight'] ?? null,
-            'type'       => $validated['type'],
-            'completed'  => 0,
-        ]);
+    Exercise::create([
+        'day_id'    => $day_id,
+        'name'      => $validated['name'],
+        'series'    => $validated['series'] ?? 1,
+        'reps'      => $validated['reps'] ?? 1,
+        'weight'    => $validated['weight'] ?? null,
+        'type'      => $validated['type'],
+        'distance'  => $validated['distance'] ?? null,
+        'pace'      => $validated['pace'] ?? null,
+        'bpm_min'   => $validated['bpm_min'] ?? null,
+        'bpm_max'   => $validated['bpm_max'] ?? null,
+        'rest_min'  => $validated['rest_min'] ?? null,
+        'rest_max'  => $validated['rest_max'] ?? null,
+        'completed' => 0,
+    ]);
 
-        return redirect("/packs/$pack_id/day/$day_id");
-    }
+    return redirect("/packs/$pack_id/day/$day_id");
+}
 
     // Añadir un sub-ejercicio HIIT a un ejercicio principal
     public function addHiitExercise(Request $request, $exerciseId)
